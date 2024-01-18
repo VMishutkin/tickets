@@ -1,12 +1,14 @@
-package org.example;
+package org.example.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
 @Getter
+@Setter
 public class Ticket {
 
     private String origin;
@@ -19,15 +21,10 @@ public class Ticket {
     private String departureDate;
     @JsonProperty("departure_time")
     private String departureTime;
-    @JsonIgnore
-    private LocalDateTime departureDateTime;
     @JsonProperty("arrival_date")
     private String arrivalDate;
     @JsonProperty("arrival_time")
     private String arrivalTime;
-    @JsonIgnore
-    private LocalDateTime arrivalDateTime;
-
     private String carrier;
     private Integer stops;
     private Integer price;
