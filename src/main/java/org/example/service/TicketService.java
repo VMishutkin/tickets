@@ -8,12 +8,16 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.OptionalDouble;
 
 import static java.util.stream.Collectors.toList;
 
 public class TicketService {
-
+    /**
+     * Метод считает минимальное время полета
+     * @param ticketList список билетов в формате из файла tickets.json
+     * @param origin код аэропорта вылета
+     * @param destination код аэропорта назначения
+     */
     public void foundMinTimeFlight(TicketsList ticketList, String origin, String destination) {
 
         addZeroInHours(ticketList);
@@ -24,6 +28,11 @@ public class TicketService {
         ;
     }
 
+    /**
+     * Преобразовывает разницу в секундах в строку, содержащую часы минуты и секунды
+     * @param min - разница в полетах в секундах
+     * @return строка содержащая часы, минуты и секунды
+     */
     private String getMinFlightTimeAsString(long min) {
         long hour = min / 3600,
                 minute = min / 60 % 60,
@@ -31,6 +40,10 @@ public class TicketService {
         return hour + " часов, " + minute + " минут и " + sec + " секунд.";
     }
 
+    /**
+     * Добавляет 0 в строке где часы одной цифрой, должно быть везде 2
+     * @param ticketList список билетов из файла json
+     */
     private void addZeroInHours(TicketsList ticketList) {
         for (Ticket ticket : ticketList.getTickets()) {
             if (ticket.getDepartureTime().length() == 4) {
@@ -42,6 +55,13 @@ public class TicketService {
         }
     }
 
+    /**
+     * метод из списка билетов фильтрует по нужным аэропортам и возвращает времени полета
+     * @param ticketList список билетов из файла json
+     * @param origin код аэропорта вылета
+     * @param destination код аэропорта назначения
+     * @return список времени полета из аэропорта origin в destination
+     */
     private List<Long> countFlightTimes(TicketsList ticketList, String origin, String destination) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yy HH:mm");
         LocalDateTime departureDateTime;
@@ -58,7 +78,13 @@ public class TicketService {
         return flightTimes;
     }
 
-    public void foundPrices(TicketsList ticketsList, String origin, String destination) {
+    /**
+     * Выводит разницу между средней ценой и медианой
+     * @param ticketsList список билетов из файла json
+     * @param origin код аэропорта вылета
+     * @param destination код аэропорта назначения
+     */
+    public void foundDiffBetweenAverageAndMedianPrices(TicketsList ticketsList, String origin, String destination) {
 
         double average = countAveragePrice(ticketsList.getTickets(), origin, destination);
         double median = countMedianPrice(ticketsList.getTickets(), origin, destination);
@@ -70,6 +96,13 @@ public class TicketService {
 
     }
 
+    /**
+     * Считает медианную цену
+     * @param tickets список билетов
+     * @param origin код аэропорта вылета
+     * @param destination код аэропорта назначения
+     * @return
+     */
     private double countMedianPrice(List<Ticket> tickets, String origin, String destination) {
         List<Integer> prices = tickets
                 .stream()
@@ -83,6 +116,13 @@ public class TicketService {
                 prices.get(prices.size() / 2);
     }
 
+    /**
+     * Считает среднюю цену
+     * @param tickets список билетов из файла json
+     * @param origin код аэропорта вылета
+     * @param destination код аэропорта назначения
+     * @return
+     */
     private double countAveragePrice(List<Ticket> tickets, String origin, String destination) {
         return tickets
                 .stream()

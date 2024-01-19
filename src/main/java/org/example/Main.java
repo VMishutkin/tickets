@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.example.model.TicketsList;
 import org.example.service.TicketService;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 
@@ -21,7 +20,7 @@ public class Main {
         TicketService ticketService = new TicketService();
 
         ticketService.foundMinTimeFlight(ticketList, "VVO", "TLV");
-        ticketService.foundPrices(ticketList, "VVO", "TLV");
+        ticketService.foundDiffBetweenAverageAndMedianPrices(ticketList, "VVO", "TLV");
     }
 
 
