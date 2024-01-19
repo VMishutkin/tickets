@@ -21,11 +21,18 @@ public class TicketService {
     public void foundMinTimeFlight(TicketsList ticketList, String origin, String destination) {
 
         addZeroInHours(ticketList);
-        List<Long> flightTimes = countFlightTimes(ticketList, origin, destination);
-        long min = flightTimes.stream().mapToLong(v -> v).min().orElseThrow(NoSuchMethodError::new);
-        String minFlightTime = getMinFlightTimeAsString(min);
-        System.out.printf("Минимальное время полета из аэропорта %s в аэропорт %s - %s\n", origin, destination, minFlightTime);
-        ;
+        List<String> carriers = ticketList.getTickets()
+                .stream()
+                .map(Ticket::getCarrier)
+                .distinct()
+                .toList();
+        for (String carrier: carriers) {
+            List<Long> flightTimes = countFlightTimes(ticketList, origin, destination, carrier);
+            long min = flightTimes.stream().mapToLong(v -> v).min().orElseThrow(NoSuchMethodError::new);
+            String minFlightTime = getMinFlightTimeAsString(min);
+            System.out.printf("Минимальное время полета из аэропорта %s в аэропорт %s перевозчиком %s- %s\n", origin, destination, carrier, minFlightTime);
+        }
+
     }
 
     /**
@@ -57,12 +64,14 @@ public class TicketService {
 
     /**
      * метод из списка билетов фильтрует по нужным аэропортам и возвращает времени полета
-     * @param ticketList список билетов из файла json
-     * @param origin код аэропорта вылета
+     *
+     * @param ticketList  список билетов из файла json
+     * @param origin      код аэропорта вылета
      * @param destination код аэропорта назначения
+     * @param carrier
      * @return список времени полета из аэропорта origin в destination
      */
-    private List<Long> countFlightTimes(TicketsList ticketList, String origin, String destination) {
+    private List<Long> countFlightTimes(TicketsList ticketList, String origin, String destination, String carrier) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yy HH:mm");
         LocalDateTime departureDateTime;
         LocalDateTime arrivalDateTime;
@@ -70,7 +79,7 @@ public class TicketService {
         for (Ticket ticket : ticketList.getTickets()) {
             departureDateTime = LocalDateTime.parse(ticket.getDepartureDate() + " " + ticket.getDepartureTime(), formatter);
             arrivalDateTime = LocalDateTime.parse(ticket.getArrivalDate() + " " + ticket.getArrivalTime(), formatter);
-            if (ticket.getOrigin().equals(origin) && ticket.getDestination().equals(destination)) {
+            if (ticket.getOrigin().equals(origin) && ticket.getDestination().equals(destination) && ticket.getCarrier().equals(carrier)) {
                 long diff = departureDateTime.until(arrivalDateTime, ChronoUnit.SECONDS);
                 flightTimes.add(diff);
             }
