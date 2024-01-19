@@ -6,6 +6,9 @@ import lombok.Getter;
 import org.example.model.Ticket;
 
 import java.util.List;
+/**
+ * Класс для представления списка билетов из JSON файла
+ */
 @Getter
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class TicketsList {

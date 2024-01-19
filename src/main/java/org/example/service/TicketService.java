@@ -14,12 +14,21 @@ import static java.util.stream.Collectors.toList;
 
 public class TicketService {
 
-    public long foundMinTimeFlight(TicketsList ticketList, String origin, String destination) {
+    public void foundMinTimeFlight(TicketsList ticketList, String origin, String destination) {
 
         addZeroInHours(ticketList);
         List<Long> flightTimes = countFlightTimes(ticketList, origin, destination);
         long min = flightTimes.stream().mapToLong(v -> v).min().orElseThrow(NoSuchMethodError::new);
-        return min;
+        String minFlightTime = getMinFlightTimeAsString(min);
+        System.out.printf("Минимальное время полета из аэропорта %s в аэропорт %s - %s\n", origin, destination, minFlightTime);
+        ;
+    }
+
+    private String getMinFlightTimeAsString(long min) {
+        long hour = min / 3600,
+                minute = min / 60 % 60,
+                sec = min / 1 % 60;
+        return hour + " часов, " + minute + " минут и " + sec + " секунд.";
     }
 
     private void addZeroInHours(TicketsList ticketList) {
@@ -40,7 +49,7 @@ public class TicketService {
         List<Long> flightTimes = new ArrayList<>();
         for (Ticket ticket : ticketList.getTickets()) {
             departureDateTime = LocalDateTime.parse(ticket.getDepartureDate() + " " + ticket.getDepartureTime(), formatter);
-            arrivalDateTime = LocalDateTime.parse(ticket.getDepartureDate() + " " + ticket.getDepartureTime(), formatter);
+            arrivalDateTime = LocalDateTime.parse(ticket.getArrivalDate() + " " + ticket.getArrivalTime(), formatter);
             if (ticket.getOrigin().equals(origin) && ticket.getDestination().equals(destination)) {
                 long diff = departureDateTime.until(arrivalDateTime, ChronoUnit.SECONDS);
                 flightTimes.add(diff);
@@ -49,11 +58,16 @@ public class TicketService {
         return flightTimes;
     }
 
-    public Double foundPrices(TicketsList ticketsList, String origin, String destination) {
+    public void foundPrices(TicketsList ticketsList, String origin, String destination) {
 
         double average = countAveragePrice(ticketsList.getTickets(), origin, destination);
         double median = countMedianPrice(ticketsList.getTickets(), origin, destination);
-        return average - median;
+        String resultString = average >= median ?
+                "Средняя цена больше медианной на " + (average - median) + " рублей" :
+                "Средняя цена меньше медианной на " + (median - average) + " рублей";
+        System.out.println(resultString);
+
+
     }
 
     private double countMedianPrice(List<Ticket> tickets, String origin, String destination) {
@@ -64,7 +78,6 @@ public class TicketService {
                 .boxed()
                 .sorted()
                 .collect(toList());
-        System.out.println(prices);
         return prices.size() % 2 == 0 ?
                 (double) (prices.get(prices.size() / 2 - 1) + prices.get(prices.size() / 2)) / 2 :
                 prices.get(prices.size() / 2);

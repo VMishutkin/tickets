@@ -7,6 +7,9 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 
+/**
+ * Класс для представления билета из JSON файла
+ */
 @Getter
 @Setter
 public class Ticket {
